@@ -11,7 +11,7 @@ static mut testing:i16 = 0;
 use mspm0l130x::interrupt;
 use crate::gpio;
 use crate::uart;
-
+/* 
 #[exception]
 fn SysTick() {
     /* */
@@ -73,7 +73,7 @@ unsafe fn DefaultHandler(_irqn: i16) {
 }
 
 
-
+*/
 
 
 pub fn interruptsetupgpio(){
