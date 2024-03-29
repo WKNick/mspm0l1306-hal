@@ -7,7 +7,7 @@ description = "HAL crate for TI MSPM0L130X microcontroller"
 version = "0.1.0"
 repository = "https://github.com/WKNick/mspm0l1306-hal"
 license = "MIT OR Apache-2.0"
-keywords = ["hal", "no-std", "mspm0", "svd2rust", "embedded", "ti"]
+keywords = ["hal", "mspm0", "svd2rust", "embedded", "ti"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
