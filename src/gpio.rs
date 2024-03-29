@@ -1,11 +1,29 @@
 
-use panic_halt as _; // used to allow rust to run so it knows what to do if program crashes
 
 
-use mspm0l130x as pac; // the rust crate created for the MSPM0L for peripherals access
+use mspm0l130x as pac;
+
+use crate::timg::TIMG0; // the rust crate created for the MSPM0L for peripherals access
+use crate::timg::TIMG1; // the rust crate created for the MSPM0L for peripherals access
+
+use paste::paste;
+
+use crate::generate_set_functions;
+use crate::generate_get_functions;
 
 
+generate_set_functions!(GPIOA, fsub_0, fsub_1, fpub_0, fpub_1, pwren, rstctl, clkovr, pdbgctl, evt_mode, dout31_0, doe31_0, polarity15_0);//MANY missing regs polarity 31_16 is most noticable since 15_0 is there but every register after is also missing
+generate_get_functions!(GPIOA, fsub_0, fsub_1, fpub_0, fpub_1, pwren, stat, clkovr, pdbgctl, evt_mode, desc, dout31_0, doe31_0, din31_0, polarity15_0);//MANY missing regs polarity 31_16 is most noticable since 15_0 is there but every register after is also missing
 
+
+pub fn enable(){
+    unsafe{
+        let peripherals = pac::Peripherals::steal();
+        let gpioa = peripherals.GPIOA;
+        gpioa.rstctl.write(|w|w.bits(0xb1000003));// reset gpio info
+        gpioa.pwren.write(|w|w.bits(0x26000001));// enable gpio with reset key
+        }
+}
 
 
 
@@ -47,9 +65,9 @@ pub struct PA31;
 
 
 
-pub struct PortA;
+pub struct GPIOA;
 
-impl PortA {
+impl GPIOA {
     pub fn split(self) -> PortAPins {
         PortAPins {
             pa0: PA0,
@@ -152,9 +170,7 @@ pub fn set_high(&self){
     unsafe{
     let peripherals = pac::Peripherals::steal();
     let gpioa = peripherals.GPIOA;
-    //if self.pin_cm != 0x00000081{
-        self.set_mac(0x00000081); // sets self as output
-    //}
+
     gpioa.doe31_0.write(|w|w.bits(gpioa.doe31_0.read().bits() | ((1u32)<<self.pin))); // set own pin to enable outputs
     gpioa.dout31_0.write(|w|w.bits(gpioa.dout31_0.read().bits() | ((1u32)<<self.pin)));// setting own pin to ouput of 1
     }
@@ -164,9 +180,6 @@ pub fn set_low(&self){
     let peripherals = pac::Peripherals::steal();
     let gpioa = peripherals.GPIOA;
 
-   // if self.pin_cm != 0x00000081{
-        self.set_mac(0x00000081); // sets self as output
-    //}
 
     gpioa.doe31_0.write(|w|w.bits(gpioa.doe31_0.read().bits() | ((1u32)<<self.pin))); // set own pin to enable outputs
     gpioa.dout31_0.write(|w|w.bits(gpioa.dout31_0.read().bits() & !((1u32)<<self.pin)));// setting own pin to ouput of 0
@@ -216,11 +229,53 @@ impl PA0 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 0 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x04000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x04000081);
+        self.erase_pin().set_high();
+    }
+
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x04000084);
+    
+        TIMG1::set_ccctl_01_0(0x00000000);
+    
+        TIMG1::set_octl_01_0(0x00000000);
+    
+        TIMG1::set_ccact_01_0(0x00000280);
+    
+        TIMG1::set_octl_01_0(0x00000000);
+
+        TIMG1::set_cc_01_0(((((0 as f32) / 100.0)) * (TIMG1::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG1::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG1::get_load() as f32)) as u32);
+    }
+
 }
 
 impl PA1 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 1 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -228,11 +283,33 @@ impl PA2 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 2 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA3 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 3 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -240,17 +317,66 @@ impl PA4 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 4 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA5 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 5 }
     }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
+
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000082);
+    
+        TIMG0::set_ccctl_01_0(0x00000000);
+    
+        TIMG0::set_octl_01_0(0x00000000);
+    
+        TIMG0::set_ccact_01_0(0x00000280);
+    
+        TIMG0::set_octl_01_0(0x00000000);
+
+        TIMG0::set_cc_01_0(((1.0 - ((0 as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG0::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
+
 }
 
 impl PA6 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 6 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -258,11 +384,36 @@ impl PA7 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 7 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA8 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 8 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
+    pub fn config_tx(&self){
+        self.erase_pin().set_mac(0x00000082);
     }
 }
 
@@ -270,11 +421,36 @@ impl PA9 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 9 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
+    pub fn config_rx(&self){
+        self.erase_pin().set_mac(0x00040082);
+    }
 }
 
 impl PA10 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 10 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -282,11 +458,33 @@ impl PA11 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 11 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA12 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 12 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -298,9 +496,11 @@ impl PA13 { // an led
         self.erase_pin().set_mac(value);
     }
     pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_low();
     }
     pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
 }
@@ -308,6 +508,14 @@ impl PA13 { // an led
 impl PA14 { // sw
     pub fn erase_pin(&self) -> PA {
         PA { pin: 14 }
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 
     pub fn set_mac(&self, value: u32){
@@ -325,11 +533,33 @@ impl PA15 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 15 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA16 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 16 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -337,15 +567,37 @@ impl PA17 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 17 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA18 {//sw
     pub fn erase_pin(&self) -> PA {
         PA { pin: 18 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
     pub fn get_input(&self) -> bool{
         self.erase_pin().set_mac(0x00050081);
         return self.erase_pin().get_input();
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -353,11 +605,33 @@ impl PA19 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 19 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA20 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 20 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -365,11 +639,33 @@ impl PA21 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 21 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA22 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 22 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -377,17 +673,50 @@ impl PA23 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 23 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA24 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 24 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA25 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 25 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -399,9 +728,11 @@ impl PA26 { // an led
         self.erase_pin().set_mac(value);
     }
     pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_low();
     }
     pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
 }
@@ -414,9 +745,11 @@ impl PA27 { // an led
         self.erase_pin().set_mac(value);
     }
     pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_low();
     }
     pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
 }
@@ -425,11 +758,33 @@ impl PA28 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 28 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA29 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 29 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 
@@ -437,11 +792,33 @@ impl PA30 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 30 }
     }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
+    }
 }
 
 impl PA31 {
     pub fn erase_pin(&self) -> PA {
         PA { pin: 31 }
+    }
+    pub fn set_mac(&self, value: u32){
+        self.erase_pin().set_mac(value);
+    }
+    pub fn set_low(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_low();
+    }
+    pub fn set_high(&self){
+        self.erase_pin().set_mac(0x00000081);
+        self.erase_pin().set_high();
     }
 }
 

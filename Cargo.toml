@@ -1,34 +1,15 @@
 [package]
-authors = ["Team27"]
-edition = "2018"
-readme = "README.md"
 name = "MSPM0L1306-HAL"
 version = "0.1.0"
+edition = "2021"
 
-
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 cortex-m-rtic = "1.1.4"
 cortex-m = "0.7.7"
-cortex-m-rt = "0.7.3"
-# mspm0l130x = "0.1.1"
-mspm0l130x = { path = "C:/Users/nicks/Desktop/MSPM0 Register Map 2/mspm0l1306x"}
+cortex-m-rt = "0.6.10"
+mspm0l130x = { version = "0.1.5", features = ["rt"]}
 cortex-m-semihosting = "0.5.0"
-panic-halt = "0.2.0"
 embedded-hal = "1.0.0"
-
-
-
-
-
-
-# this lets you use `cargo fix`!
-[[bin]]
-name = "MSPM0L1306-HAL"
-test = false
-bench = false
-
-[profile.release]
-codegen-units = 1 # better optimizations
-debug = true # symbols are nice and they don't increase the size on Flash
-lto = true # better optimizations
+paste = "1.0.14"
