@@ -1,7 +1,10 @@
 [package]
+authors = ["Team27"]
+edition = "2021"
+readme = "README.md"
 name = "MSPM0L1306-HAL"
 version = "0.1.0"
-edition = "2021"
+repository = "https://github.com/WKNick/mspm0l1306-hal"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
