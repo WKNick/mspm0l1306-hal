@@ -117,3 +117,24 @@ pub fn interruptsetupsysttick(){
    // let mut nvic = p.NVIC;
    // nvic.ipr[].read();
 }
+
+fn initfn(){ // enables pa18 and 14 switches THIS IS TEMPORARY THIS WHOLE FILE NEEDS TO BE REMADE
+    gpio::enable();
+
+interruptsetupgpio();// sets up pa14 sw
+
+gpio::GPIOA.split().pa18.set_mac(0x00050081);
+
+unsafe{
+let peripherals = pac::Peripherals::steal();
+let gpioa = peripherals.GPIOA;
+let nvic = pac::CorePeripherals::steal().NVIC;
+gpioa.int_event0_imask.write(|w|w.bits(0x00044000));
+
+gpioa.polarity31_16.write(|w|w.bits(0x00000030));
+
+nvic.iser[0].write(0x00000002);
+
+
+}
+}

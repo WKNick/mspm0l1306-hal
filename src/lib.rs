@@ -10,3 +10,4 @@ pub mod nvic;
 pub mod spi;
 pub mod adc;
 pub mod comp;
+pub mod clock;
