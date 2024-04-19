@@ -1,4 +1,3 @@
-
 use mspm0l130x as pac; // the rust crate created for the MSPM0L for peripherals access
 
 

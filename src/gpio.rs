@@ -3,8 +3,10 @@
 
 use mspm0l130x as pac;
 
-use crate::timg::TIMG0; // the rust crate created for the MSPM0L for peripherals access
-use crate::timg::TIMG1; // the rust crate created for the MSPM0L for peripherals access
+use crate::timg::TIMG0;
+use crate::timg::TIMG1;
+use crate::timg::TIMG2; // not completed for all pins 
+use crate::timg::TIMG4; // not completed for all pins 
 
 use paste::paste;
 
@@ -277,6 +279,24 @@ impl PA1 {
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000084);
+    
+        TIMG1::set_ccctl_01_1(0x00000000);
+    
+        TIMG1::set_octl_01_1(0x00000000);
+    
+        TIMG1::set_ccact_01_1(0x00000280);
+    
+        TIMG1::set_octl_01_1(0x00000000);
+
+        TIMG1::set_cc_01_1(((1.0 - ((0 as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG1::set_cc_01_1(((1.0 - ((val as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
+    
 }
 
 impl PA2 {
@@ -294,6 +314,23 @@ impl PA2 {
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000082);
+    
+        TIMG1::set_ccctl_01_1(0x00000000);
+    
+        TIMG1::set_octl_01_1(0x00000000);
+    
+        TIMG1::set_ccact_01_1(0x00000280);
+    
+        TIMG1::set_octl_01_1(0x00000000);
+
+        TIMG1::set_cc_01_1(((1.0 - ((0 as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG1::set_cc_01_1(((1.0 - ((val as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
 }
 
 impl PA3 {
@@ -310,6 +347,24 @@ impl PA3 {
     pub fn set_high(&self){
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
+    }
+
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000082);
+    
+        TIMG2::set_ccctl_01_0(0x00000000);
+    
+        TIMG2::set_octl_01_0(0x00000000);
+    
+        TIMG2::set_ccact_01_0(0x00000280);
+    
+        TIMG2::set_octl_01_0(0x00000000);
+
+        TIMG2::set_cc_01_0(((1.0 - ((0 as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG2::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
     }
 }
 
@@ -378,6 +433,23 @@ impl PA6 {
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000082);
+    
+        TIMG0::set_ccctl_01_1(0x00000000);
+    
+        TIMG0::set_octl_01_1(0x00000000);
+    
+        TIMG0::set_ccact_01_1(0x00000280);
+    
+        TIMG0::set_octl_01_1(0x00000000);
+
+        TIMG0::set_cc_01_1(((1.0 - ((0 as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG0::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
 }
 
 impl PA7 {
@@ -394,6 +466,23 @@ impl PA7 {
     pub fn set_high(&self){
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
+    }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000084);
+    
+        TIMG1::set_ccctl_01_0(0x00000000);
+    
+        TIMG1::set_octl_01_0(0x00000000);
+    
+        TIMG1::set_ccact_01_0(0x00000280);
+    
+        TIMG1::set_octl_01_0(0x00000000);
+
+        TIMG1::set_cc_01_0(((1.0 - ((0 as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG1::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
     }
 }
 
@@ -486,6 +575,23 @@ impl PA12 {
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000083);
+    
+        TIMG0::set_ccctl_01_0(0x00000000);
+    
+        TIMG0::set_octl_01_0(0x00000000);
+    
+        TIMG0::set_ccact_01_0(0x00000280);
+    
+        TIMG0::set_octl_01_0(0x00000000);
+
+        TIMG0::set_cc_01_0(((1.0 - ((0 as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG0::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
 }
 
 impl PA13 { // an led
@@ -502,6 +608,23 @@ impl PA13 { // an led
     pub fn set_high(&self){
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
+    }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000083);
+    
+        TIMG0::set_ccctl_01_1(0x00000000);
+    
+        TIMG0::set_octl_01_1(0x00000000);
+    
+        TIMG0::set_ccact_01_1(0x00000280);
+    
+        TIMG0::set_octl_01_1(0x00000000);
+
+        TIMG0::set_cc_01_1(((1.0 - ((0 as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG0::set_cc_01_1(((1.0 - ((val as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
     }
 }
 
@@ -525,6 +648,23 @@ impl PA14 { // sw
     pub fn get_input(&self) -> bool{
         self.erase_pin().set_mac(0x04060081);
         return self.erase_pin().get_input();
+    }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000085);
+    
+        TIMG1::set_ccctl_01_0(0x00000000);
+    
+        TIMG1::set_octl_01_0(0x00000000);
+    
+        TIMG1::set_ccact_01_0(0x00000280);
+    
+        TIMG1::set_octl_01_0(0x00000000);
+
+        TIMG1::set_cc_01_0(((1.0 - ((0 as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG1::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
     }
  
 }
@@ -560,6 +700,23 @@ impl PA16 {
     pub fn set_high(&self){
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
+    }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000085);
+    
+        TIMG0::set_ccctl_01_0(0x00000000);
+    
+        TIMG0::set_octl_01_0(0x00000000);
+    
+        TIMG0::set_ccact_01_0(0x00000280);
+    
+        TIMG0::set_octl_01_0(0x00000000);
+
+        TIMG0::set_cc_01_0(((1.0 - ((0 as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG0::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
     }
 }
 
@@ -684,6 +841,23 @@ impl PA23 {
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000084);
+    
+        TIMG0::set_ccctl_01_0(0x00000000);
+    
+        TIMG0::set_octl_01_0(0x00000000);
+    
+        TIMG0::set_ccact_01_0(0x00000280);
+    
+        TIMG0::set_octl_01_0(0x00000000);
+
+        TIMG0::set_cc_01_0(((1.0 - ((0 as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG0::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
 }
 
 impl PA24 {
@@ -700,6 +874,23 @@ impl PA24 {
     pub fn set_high(&self){
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
+    }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000083);
+    
+        TIMG0::set_ccctl_01_1(0x00000000);
+    
+        TIMG0::set_octl_01_1(0x00000000);
+    
+        TIMG0::set_ccact_01_1(0x00000280);
+    
+        TIMG0::set_octl_01_1(0x00000000);
+
+        TIMG0::set_cc_01_1(((1.0 - ((0 as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG0::set_cc_01_1(((1.0 - ((val as f32) / 100.0)) * (TIMG0::get_load() as f32)) as u32);
     }
 }
 
@@ -735,6 +926,24 @@ impl PA26 { // an led
         self.erase_pin().set_mac(0x00000081);
         self.erase_pin().set_high();
     }
+    pub fn configure_pwm(&self){
+        self.erase_pin().set_mac(0x00000083);
+    
+        TIMG1::set_ccctl_01_0(0x00000000);
+    
+        TIMG1::set_octl_01_0(0x00000000);
+    
+        TIMG1::set_ccact_01_0(0x00000280);
+    
+        TIMG1::set_octl_01_0(0x00000000);
+
+        TIMG1::set_cc_01_0(((1.0 - ((0 as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
+
+    pub fn setpwm(&self, val: u32){
+        TIMG1::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG2::get_load() as f32)) as u32);
+    }
+    
 }
 
 impl PA27 { // an led

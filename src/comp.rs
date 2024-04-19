@@ -1,4 +1,3 @@
-
 use mspm0l130x as pac; // the rust crate created for the MSPM0L for peripherals access
 
 
@@ -41,16 +40,17 @@ pub fn initialize_comp_led_demo(){
         COMP0::set_rstctl(0xB1000003);
 
         gpioa.pwren.write(|w|w.bits(0x26000001));// enable gpio with reset key
-        COMP0::set_pwren(0x26000001);
         vref.pwren.write(|w|w.bits(0x26000001));// reset gpio info
-        
+        COMP0::set_pwren(0x26000001);
+
         iomux.pincm[0].write(|w| unsafe {w.bits(0x00000081)});//check 4 here in iomux receiver
         iomux.pincm[19].write(|w| unsafe {w.bits(0x00060082)});//check 4 here in iomux receiver
         iomux.pincm[20].write(|w| unsafe {w.bits(0x00050082)});//check 4 here in iomux receiver
 
         gpioa.dout31_0.write(|w| unsafe {w.bits(0x0000001)});
         gpioa.doe31_0.write(|w| unsafe {w.bits(0x0000001)});
-
+        gpioa.pdbgctl.write(|w| unsafe {w.bits(0x0000001)});
+       
         sys.sysosccfg.write(|w| unsafe {w.bits(0x00020000)});
 
         //vref set up
@@ -63,7 +63,8 @@ pub fn initialize_comp_led_demo(){
         COMP0::set_ctl1(0x0560);
         COMP0::set_ctl2(0x00010008);
         COMP0::set_ctl1(0x0561);
-        COMP0::set_ctl3(0x0000007F); 
+        COMP0::set_ctl3(0x000000);
+        COMP0::set_ctl3(0x0000007F);
 
     }
 }

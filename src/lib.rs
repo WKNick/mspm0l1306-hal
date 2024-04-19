@@ -11,3 +11,5 @@ pub mod spi;
 pub mod adc;
 pub mod comp;
 pub mod clock;
+pub mod vref;
+pub mod opa;

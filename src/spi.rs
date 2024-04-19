@@ -1,6 +1,4 @@
 
-
-
 //use cortex_m; // not currently used idk if we will need it but no reason to remove
 
 //use cortex_m_rt::entry; // I think this is what allows us to create main
@@ -9,7 +7,6 @@ use mspm0l130x as pac; // the rust crate created for the MSPM0L for peripherals 
 
 
 use paste::paste;
-use rtic::Mutex;
 
 use crate::generate_set_functions;
 use crate::generate_get_functions;
@@ -23,26 +20,45 @@ pub struct SPI0;
 
 
 pub fn SPI_enable() { //enables SPI registers
+    
+        //Reset GpiO
         SPI0::set_rstctl(0xb1000003);// reset gpio info
+
+        //enable the power of gpioa
         SPI0::set_pwren(0x26000001);// enable gpio with reset key
 
-        SPI0::set_clksel(0x4);// mfclk
-        //SPI0::set_clksel(0x8);// sysclk
-        SPI0::set_clkdiv(0x0);// clock division, currently set to no clock division
-        SPI0::set_clkctl(0x0);// serial clock divider, set to 0 currently
+        // Example of setting registers
+        unsafe{
+        let peripherals = pac::Peripherals::steal();
+        let iomux = peripherals.IOMUX;
+        iomux.pincm[20].write(|w| unsafe {w.bits(0x50082)});
+        iomux.pincm[19].write(|w| unsafe {w.bits(0x60082)});
+        iomux.pincm[6].write(|w| unsafe {w.bits(0x83)});
+        iomux.pincm[5].write(|w| unsafe {w.bits(0x83)});
+        iomux.pincm[4].write(|w| unsafe {w.bits(0x40083)});
+        iomux.pincm[7].write(|w| unsafe {w.bits(0x83)});
+        
+    }
 
-        SPI0::set_ctl1(0x14);
-        SPI0::set_ctl0(0x3);
-        SPI0::set_ctl1(0x15);//enable SPI
+        //SPI0::set_clksel(0x4);// mfclk
+        SPI0::set_clksel(0x4);// sysclk
+        SPI0::set_clkdiv(0x0);// clock division, currently set to no clock division
+        SPI0::set_clkctl(0x1F);// serial clock divider
+
+        SPI0::set_pdbgctl(0x3);
+        SPI0::set_evt_mode(0x29);
+
+        //SPI0::set_ctl1(0x814);
+        SPI0::set_ctl0(0x07);
+        SPI0::set_ctl1(0x815);// enable SPI
+
+        SPI0::set_ifls(0x3F);
+
 }
 
-pub fn SPI_test() {
-    unsafe{
-        let peripherals = pac::Peripherals::steal();
-        let spi: pac::SPI0 = peripherals.SPI0;
-
-        spi.txdata.write(|w|unsafe {w.bits(0x25)});
-    }
+// Function to send data through MOSI
+pub fn SPI_send(value: u32) {
+    SPI0::set_txdata(value);
 }
 
 /*

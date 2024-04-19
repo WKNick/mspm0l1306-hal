@@ -76,33 +76,9 @@ unsafe fn DefaultHandler(_irqn: i16) {
 */
 
 
-pub fn interruptsetupgpio(){
-    unsafe{
-        let peripherals = pac::Peripherals::steal();
-        let gpioa = peripherals.GPIOA;
-       
-
-        //gpioa.evt_mode.write(|w|w.bits(0x00000028));
-        let EXTI0_INTERRUPT_NUMBER: i16 = 6;
-
-        gpio::GPIOA.split().pa14.set_mac(0x04060081);
-
-        gpioa.int_event0_imask.write(|w|w.bits(0x00004000));
-
-        gpioa.polarity15_0.write(|w|w.bits(0x30000000));
-
-        let nvic = pac::CorePeripherals::steal().NVIC;
-        nvic.iser[0].write(0x00000002);
-        //nvic.icer[0].write(0x00000002);
-        //NVIC::unmask(<Nr as cortex_m::interrupt::InterruptNumber>::number(3));
-
-        //gpioa.int_event0_iset.write(|w|w.bits(0x00004000));
-        }   
-}
-
 pub fn interruptsetupsysttick(){
-
-    let p = cortex_m::Peripherals::take().unwrap();
+unsafe{
+    let p = cortex_m::Peripherals::steal();
     let mut syst = p.SYST;
 
     // configures the system timer to trigger a SysTick exception every second
@@ -112,29 +88,25 @@ pub fn interruptsetupsysttick(){
     syst.clear_current();
     syst.enable_counter();
     syst.enable_interrupt();
-
-
-   // let mut nvic = p.NVIC;
-   // nvic.ipr[].read();
 }
 
-fn initfn(){ // enables pa18 and 14 switches THIS IS TEMPORARY THIS WHOLE FILE NEEDS TO BE REMADE
-    gpio::enable();
-
-interruptsetupgpio();// sets up pa14 sw
-
-gpio::GPIOA.split().pa18.set_mac(0x00050081);
-
-unsafe{
-let peripherals = pac::Peripherals::steal();
-let gpioa = peripherals.GPIOA;
-let nvic = pac::CorePeripherals::steal().NVIC;
-gpioa.int_event0_imask.write(|w|w.bits(0x00044000));
-
-gpioa.polarity31_16.write(|w|w.bits(0x00000030));
-
-nvic.iser[0].write(0x00000002);
-
-
 }
+
+pub fn interruptsetupgpioswitches(){
+    unsafe{
+        let peripherals = pac::Peripherals::steal();
+        let gpioa = peripherals.GPIOA;
+       
+        gpio::GPIOA.split().pa14.set_mac(0x04060081); //14 setup for gpio
+        gpio::GPIOA.split().pa18.set_mac(0x00050081); //18 setup for gpio
+
+        gpioa.int_event0_imask.write(|w|w.bits(0x00044000));
+
+        gpioa.polarity15_0.write(|w|w.bits(0x30000000));
+        gpioa.polarity31_16.write(|w|w.bits(0x00000030));
+
+        let nvic: pac::NVIC = pac::CorePeripherals::steal().NVIC;
+        nvic.iser[0].write(0x00000002);
+
+        }  
 }
