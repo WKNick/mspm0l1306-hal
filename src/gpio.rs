@@ -14,10 +14,10 @@ use crate::generate_set_functions;
 use crate::generate_get_functions;
 
 
-generate_set_functions!(GPIOA, fsub_0, fsub_1, fpub_0, fpub_1, pwren, rstctl, clkovr, pdbgctl, evt_mode, dout31_0, doe31_0, polarity15_0);//MANY missing regs polarity 31_16 is most noticable since 15_0 is there but every register after is also missing
-generate_get_functions!(GPIOA, fsub_0, fsub_1, fpub_0, fpub_1, pwren, stat, clkovr, pdbgctl, evt_mode, desc, dout31_0, doe31_0, din31_0, polarity15_0);//MANY missing regs polarity 31_16 is most noticable since 15_0 is there but every register after is also missing
+generate_set_functions!(GPIOA, fsub_0, fsub_1, fpub_0, fpub_1, pwren, rstctl, clkovr, pdbgctl, evt_mode, dout31_0, doe31_0, polarity15_0, polarity31_16, ctl, fastwake, sub0cfg, filteren15_0, filteren31_16, dmamask, sub1cfg);
+generate_get_functions!(GPIOA, fsub_0, fsub_1, fpub_0, fpub_1, pwren, stat, clkovr, pdbgctl, evt_mode, desc, dout31_0, doe31_0, din31_0, polarity15_0, polarity31_16, ctl, fastwake, sub0cfg, filteren15_0, filteren31_16, dmamask, sub1cfg);
 
-
+///enables peripheral 
 pub fn enable(){
     unsafe{
         let peripherals = pac::Peripherals::steal();
@@ -144,7 +144,7 @@ pub struct PortAPins {
 }
 
 
-/// A pin on port A.
+/// A generic pin on port A.
 pub struct PA {
     /// The pin number.
     pin: u32,
@@ -157,7 +157,7 @@ impl PA {
             pin: self.pin,
         }
     }
-// general functions PA0-PA31 can inherit for basics
+/// general functions PA0-PA31 can inherit for configuring mac
 pub fn set_mac(&self,value: u32){
     
     unsafe{
@@ -167,6 +167,7 @@ pub fn set_mac(&self,value: u32){
         }
 
 }
+/// function to set a generic pin high 
 pub fn set_high(&self){
 
     unsafe{
@@ -177,6 +178,7 @@ pub fn set_high(&self){
     gpioa.dout31_0.write(|w|w.bits(gpioa.dout31_0.read().bits() | ((1u32)<<self.pin)));// setting own pin to ouput of 1
     }
 }
+/// function to set a generic pin low 
 pub fn set_low(&self){
     unsafe{
     let peripherals = pac::Peripherals::steal();
@@ -188,6 +190,7 @@ pub fn set_low(&self){
     }
 }
 
+/// function to get an input 
 pub fn get_input(&self) -> bool{ // need something else to enable inputs mayby a diffrent mac??
     unsafe{
     let peripherals = pac::Peripherals::steal();
@@ -228,22 +231,25 @@ enum Port {
 
 
 impl PA0 {
+    ///returns pin0 as a generic pin
     pub fn erase_pin(&self) -> PA {
         PA { pin: 0 }
     }
+    ///sets mac for pin0
     pub fn set_mac(&self, value: u32){
         self.erase_pin().set_mac(value);
     }
-    
+    ///sets pin0 as an output and sets that output as low
     pub fn set_low(&self){
         self.erase_pin().set_mac(0x04000081);
         self.erase_pin().set_low();
     }
+    ///sets pin0 as an output and sets that output as high
     pub fn set_high(&self){
         self.erase_pin().set_mac(0x04000081);
         self.erase_pin().set_high();
     }
-
+    ///sets pin0 as an timg output 
     pub fn configure_pwm(&self){
         self.erase_pin().set_mac(0x04000084);
     
@@ -257,7 +263,7 @@ impl PA0 {
 
         TIMG1::set_cc_01_0(((((0 as f32) / 100.0)) * (TIMG1::get_load() as f32)) as u32);
     }
-
+    ///configures timg output for pin0 assuming it is configured as a timgoutput 
     pub fn setpwm(&self, val: u32){
         TIMG1::set_cc_01_0(((1.0 - ((val as f32) / 100.0)) * (TIMG1::get_load() as f32)) as u32);
     }

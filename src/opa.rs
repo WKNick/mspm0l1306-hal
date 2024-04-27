@@ -8,7 +8,7 @@ use crate::generate_get_functions;
 
 
 generate_set_functions!(OPA0, pwren, rstctl, clkovr, pwrctl, ctl, cfg); 
-generate_get_functions!(OPA0, pwren, stat, clkovr, pwrctl, ctl, cfg);//, fsctl, gctl missing regs
+generate_get_functions!(OPA0, pwren, stat, clkovr, pwrctl, ctl, cfg);
 
 //iidx, imask, ris, mis iset, iclr, intctl, ccpd, odis, cclkctl
 use crate::generate_set_functions_list;

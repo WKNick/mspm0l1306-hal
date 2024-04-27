@@ -1,4 +1,8 @@
-
+//! Macros for generating functions from the PAC
+//! 
+//! 
+//! 
+//! 
 #[macro_export]
 macro_rules! generate_set_functions {
     ($struct_name:ident, $($function:ident),*) => {

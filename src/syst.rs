@@ -1,4 +1,6 @@
 
+
+
 use cortex_m; // I think this is what allows us to create main
 
 use cortex_m_rt::exception; // I think this is what allows us to create main
@@ -98,12 +100,9 @@ impl SYST{
 }
 
 
-
+/// Configures a 1 second SysTick exception.
 
 pub fn interruptsetupsysttick(){
-    unsafe{
-
-
     SYST.set_clock_source(SystClkSource::Core);
 
     SYST.set_reload(32_000_000);
@@ -111,7 +110,6 @@ pub fn interruptsetupsysttick(){
     SYST.enable_counter();
     SYST.enable_interrupt();
 
-    }
 }
 
 

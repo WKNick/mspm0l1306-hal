@@ -47,13 +47,13 @@ pub struct TIMG4;
 
 
 impl TIMG0{
-
+///enables peripheral 
     pub fn enable(){// resets timg0 registers and enables them
         TIMG0::set_rstctl(0xb1000003);// reset gpio info
         TIMG0::set_pwren(0x26000001);// enable gpio with reset key
     }
 
-
+///configures registers to count up/down to 7D0 with reset enabled
     pub fn basic_config(){
 
 
@@ -78,13 +78,13 @@ impl TIMG0{
 
 
 impl TIMG1{
-
+///enables peripheral 
     pub fn enable(){// resets timg0 registers and enables them
         TIMG1::set_rstctl(0xb1000003);// reset gpio info
         TIMG1::set_pwren(0x26000001);// enable gpio with reset key
     }
 
-
+///configures registers to count up/down to 7D0 with reset enabled
     pub fn basic_config(){
 
         
@@ -108,13 +108,13 @@ impl TIMG1{
 }
 
 impl TIMG2{
-
+///enables peripheral 
     pub fn enable(){// resets timg0 registers and enables them
         TIMG2::set_rstctl(0xb1000003);// reset gpio info
         TIMG2::set_pwren(0x26000001);// enable gpio with reset key
     }
 
-
+///configures registers to count up/down to 7D0 with reset enabled
     pub fn basic_config(){
 
         
@@ -138,13 +138,13 @@ impl TIMG2{
 }
 
 impl TIMG4{
-
-    pub fn enable(){// resets timg0 registers and enables them
+///enables peripheral 
+    pub fn enable(){
         TIMG4::set_rstctl(0xb1000003);// reset gpio info
         TIMG4::set_pwren(0x26000001);// enable gpio with reset key
     }
 
-
+///configures registers to count up/down to 7D0 with reset enabled
     pub fn basic_config(){
 
         

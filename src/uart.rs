@@ -8,8 +8,8 @@ use crate::generate_set_functions;
 use crate::generate_get_functions;
 
 
-generate_set_functions!(UART0, pwren, rstctl, clkcfg, clkdiv, clksel, pdbgctl, evt_mode, ctl0, lcrh, ifls, ibrd, fbrd, gfctl, txdata, lincnt, linctl, linc0, linc1, irctl, amask, addr, clkdiv2);//, fsctl, gctl missing regs
-generate_get_functions!(UART0, pwren, stat, clkdiv, clksel, pdbgctl, evt_mode, ctl0, lcrh, desc, ifls, ibrd, fbrd, gfctl, txdata, rxdata, lincnt, linctl, linc0, linc1, irctl, amask, addr, clkdiv2);//, fsctl, gctl missing regs
+generate_set_functions!(UART0, pwren, rstctl, clkcfg, clkdiv, clksel, pdbgctl, evt_mode, ctl0, lcrh, ifls, ibrd, fbrd, gfctl, txdata, lincnt, linctl, linc0, linc1, irctl, amask, addr, clkdiv2);
+generate_get_functions!(UART0, pwren, stat, clkdiv, clksel, pdbgctl, evt_mode, ctl0, lcrh, desc, ifls, ibrd, fbrd, gfctl, txdata, rxdata, lincnt, linctl, linc0, linc1, irctl, amask, addr, clkdiv2);
 
 //iidx, imask, ris, mis iset, iclr, intctl, ccpd, odis, cclkctl
 use crate::generate_set_functions_list;

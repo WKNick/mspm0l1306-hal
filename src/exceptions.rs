@@ -9,7 +9,8 @@ use mspm0l130x as pac; // the rust crate created for the MSPM0L for peripherals 
 static mut testing:i16 = 0;
 
 use mspm0l130x::interrupt;
-use crate::gpio;
+use crate::{gpio, syst};
+use crate::syst::SYST;
 use crate::uart;
 /* 
 #[exception]
@@ -75,23 +76,18 @@ unsafe fn DefaultHandler(_irqn: i16) {
 
 */
 
-
+/// Configures a 1 second SysTick exception.
 pub fn interruptsetupsysttick(){
-unsafe{
-    let p = cortex_m::Peripherals::steal();
-    let mut syst = p.SYST;
 
-    // configures the system timer to trigger a SysTick exception every second
-    syst.set_clock_source(SystClkSource::Core);
-    // this is configured for the MSPM0L which has a default CPU clock of 32 MHz
-    syst.set_reload(32_000_000);
-    syst.clear_current();
-    syst.enable_counter();
-    syst.enable_interrupt();
-}
+    SYST.set_clock_source(syst::SystClkSource::Core);
+
+    SYST.set_reload(32_000_000);
+    SYST.clear_current();
+    SYST.enable_counter();
+    SYST.enable_interrupt();
 
 }
-
+/// Configures an interrupt on pins 14 and 18 for the two installed switches.
 pub fn interruptsetupgpioswitches(){
     unsafe{
         let peripherals = pac::Peripherals::steal();

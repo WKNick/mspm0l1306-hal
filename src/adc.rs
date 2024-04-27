@@ -1,8 +1,7 @@
 use mspm0l130x as pac; // the rust crate created for the MSPM0L for peripherals access
 
-
+use core;
 use paste::paste;
-
 use crate::generate_set_functions;
 use crate::generate_get_functions;
 
@@ -26,23 +25,65 @@ use crate::generate_get_functions_list_specify;
 
 generate_get_functions_list_specify!(ADC0, ADC0_SVT, memres, 0, memres, 1, memres, 2, memres, 3);
 
-
-
-
 pub struct ADC0;
+
+
+struct adc2;
+
+//#[derive(Debug)]
+struct adcinstruc;
+
+
+//so the or can be used; operator overload for |
+impl crate::adc::core::ops::BitOr<ADCInstructions> for ADCInstructions {
+    type Output = adcinstruc;
+
+    fn bitor(self, _rhs: ADCInstructions) -> adcinstruc {
+
+        adcinstruc
+    }
+}
+
+//enum for ADC instructions
+enum ADCInstructions  {
+    Add =0x1,
+    Subtract = 0x2,
+}
+
+
+// Creates a type alias so it can be used in the functions below
+type Commands = ADCInstructions;
+//an example of how the type commmands works 
+pub fn five() {
+    // We can refer to each variant via its alias, not its long and inconvenient
+    // name.
+    let x = Commands::Add | Commands::Subtract;
+} 
+
+//use crate::enums::commands;
+
+//LED Demo
+//For this, you will have to remove the jumper off of PA0 so that the led turns on when it is supposed to
+// Here is the led demo code
+/*
+fn main(){
+   adc::intialize_adc(); //initialize the adc
+    let x = adc::read_voltage(); // this will read the amount of counts based on the voltage reference 3.3 V
+
+   while x> 1735{// will put the led on if it is higher than 1735 counts
+        adc::putonled();
+}
+ */
+//now watch the led turn on 
 
 pub fn read_voltage()->u32{
 return ADC0::get_memres_0();
 }
-
 pub fn initialize_adc(){
-
-        
-        ADC0::set_rstctl(0xB1000003);
+        ADC0::set_rstctl(0x0);
         ADC0::set_pwren(0x26000001);
-
         //set clock Config for adc
-        ADC0::set_clkcfg(0b10101001000000000000000000000000);
+        ADC0::set_clkcfg(0xA9000000);
         ADC0::set_ctl0(0x03000000);
         ADC0::set_clkfreq(0x05);
 
@@ -89,4 +130,13 @@ pub fn initialize_adc(){
 pub fn turnoff_adc(){
     //this to save power
     ADC0::set_pwren(0x26000000);
+}
+
+pub fn putonled(){
+    unsafe{
+        let peripherals = pac::Peripherals::steal();
+        let iomux = peripherals.IOMUX;
+        iomux.pincm[0].write(|w| unsafe {w.bits(0x00000081)});//check 4 here in iomux receiver
+
+    }
 }
