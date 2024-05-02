@@ -24,38 +24,38 @@ impl SYST{
 
     pub fn clear_current(&mut self) {
         unsafe{
-        cortex_m::Peripherals::steal().SYST.clear_current();
+        pac::CorePeripherals::steal().SYST.clear_current();
         }
     }
 
     pub fn disable_counter(&mut self) {
         unsafe{
-        cortex_m::Peripherals::steal().SYST.disable_counter();
+            pac::CorePeripherals::steal().SYST.disable_counter();
         }
     }
 
     pub fn disable_interrupt(&mut self) {
         unsafe{
-        cortex_m::Peripherals::steal().SYST.disable_interrupt();
+            pac::CorePeripherals::steal().SYST.disable_interrupt();
         }
     }
 
     pub fn enable_counter(&mut self) {
         unsafe{
-        cortex_m::Peripherals::steal().SYST.enable_counter();
+            pac::CorePeripherals::steal().SYST.enable_counter();
         }
     }
 
     pub fn enable_interrupt(&mut self) {
         unsafe{
-        cortex_m::Peripherals::steal().SYST.enable_interrupt();
+            pac::CorePeripherals::steal().SYST.enable_interrupt();
         }
     }
 
 
     pub fn get_clock_source(&mut self) -> SystClkSource {
         unsafe{
-        if cortex_m::Peripherals::steal().SYST.csr.read() & SYST_CSR_CLKSOURCE != 0 {
+        if pac::CorePeripherals::steal().SYST.csr.read() & SYST_CSR_CLKSOURCE != 0 {
             SystClkSource::Core
         } else {
             SystClkSource::External
@@ -65,34 +65,34 @@ impl SYST{
 
     pub fn has_wrapped(&mut self) -> bool {
         unsafe{
-        return cortex_m::Peripherals::steal().SYST.has_wrapped();
+        return pac::CorePeripherals::steal().SYST.has_wrapped();
         }
     }
 
     pub fn is_counter_enabled(&mut self) -> bool {
         unsafe{
-        return cortex_m::Peripherals::steal().SYST.is_counter_enabled();
+        return pac::CorePeripherals::steal().SYST.is_counter_enabled();
         }
     }
 
     pub fn is_interrupt_enabled(&mut self) -> bool {
         unsafe{
-        return cortex_m::Peripherals::steal().SYST.is_interrupt_enabled();
+        return pac::CorePeripherals::steal().SYST.is_interrupt_enabled();
         }
     }
 
     pub fn set_clock_source(&mut self, clk_source: SystClkSource) {
         unsafe{
         match clk_source {
-            SystClkSource::External => cortex_m::Peripherals::steal().SYST.set_clock_source(cortex_m::peripheral::syst::SystClkSource::External),
-            SystClkSource::Core => cortex_m::Peripherals::steal().SYST.set_clock_source(cortex_m::peripheral::syst::SystClkSource::Core),
+            SystClkSource::External => pac::CorePeripherals::steal().SYST.set_clock_source(cortex_m::peripheral::syst::SystClkSource::External),
+            SystClkSource::Core => pac::CorePeripherals::steal().SYST.set_clock_source(cortex_m::peripheral::syst::SystClkSource::Core),
         }
     }
     }
 
     pub fn set_reload(&mut self, value: u32){
         unsafe{
-        cortex_m::Peripherals::steal().SYST.set_reload(value);
+            pac::CorePeripherals::steal().SYST.set_reload(value);
         }
     }
 
